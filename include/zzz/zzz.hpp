@@ -43,8 +43,7 @@ template <template <typename...> typename Container, typename T>
 
 /// Return the value associated with \p key in \p x; return nullopt if not found
 template <template <typename...> typename Mappable, typename K, typename V>
-[[nodiscard]] auto lookup(Mappable<K, V> const& x, K const& key)
-    -> std::optional<V>
+[[nodiscard]] auto lookup(Mappable<K, V> const& x, K const& key) -> std::optional<V>
 {
     auto const at = x.find(key);
     if (at == std::cend(x))
@@ -90,8 +89,7 @@ template <typename T>
 }
 
 /// Return true if there is at least one occurance of \p segment in \p x.
-[[nodiscard]] inline auto contains(std::string_view x, std::string_view segment)
-    -> bool
+[[nodiscard]] inline auto contains(std::string_view x, std::string_view segment) -> bool
 {
     return find(x, segment) != std::cend(x);
 }
@@ -106,8 +104,7 @@ template <typename Container>
 /// Merge multiple containers, with cooresponding elements stored in a tuple.
 /** Throws std::runtime_error if \p xs... are not all the same length. */
 template <typename... Ts>
-[[nodiscard]] auto zip(std::vector<Ts> const&... xs)
-    -> std::vector<std::tuple<Ts...>>
+[[nodiscard]] auto zip(std::vector<Ts> const&... xs) -> std::vector<std::tuple<Ts...>>
 {
     static_assert(sizeof...(Ts) > 1, "zzz::zip(...) needs at least 2 ranges.");
 
@@ -140,8 +137,7 @@ template <typename... Ts, std::size_t N>
 }
 
 template <typename T>
-[[nodiscard]] auto zip_with_index(std::vector<T> const& x,
-                                  std::size_t begin = 0)
+[[nodiscard]] auto zip_with_index(std::vector<T> const& x, std::size_t begin = 0)
     -> std::vector<std::pair<std::size_t, T>>
 {
     auto indices = std::vector<std::size_t>(x.size(), 0);
@@ -158,19 +154,18 @@ template <typename T>
 /// Splits a string on \p delimiter, not including the delimiter in the result.
 /** Returns a string_view into the original string. Empty segments allowed.
  *  Empty \p delimiter throws std::runtime_error. */
-[[nodiscard]] inline auto split(std::string_view x,
-                                std::string_view delimiter = " ")
+[[nodiscard]] inline auto split(std::string_view x, std::string_view delimiter = " ")
     -> std::vector<std::string_view>
 {
     if (is_empty(delimiter))
         throw std::runtime_error{"zzz::split(...) Delimiter can't be empty."};
 
-    auto begin  = std::cbegin(x);
+    auto begin = std::cbegin(x);
     auto result = std::vector<std::string_view>{};
 
     while (begin != std::cend(x)) {
-        auto const end = std::search(
-            begin, std::cend(x), std::cbegin(delimiter), std::cend(delimiter));
+        auto const end = std::search(begin, std::cend(x), std::cbegin(delimiter),
+                                     std::cend(delimiter));
 
         // Empty segments are allowed, think csv.
         result.emplace_back(std::addressof(*begin), std::distance(begin, end));
@@ -292,9 +287,7 @@ template <typename F, typename U>
 template <typename F>
 [[nodiscard]] auto reduce(F&& func)
 {
-    return [func](auto initial, auto const& x) {
-        return reduce(func, initial, x);
-    };
+    return [func](auto initial, auto const& x) { return reduce(func, initial, x); };
 }
 
 /// Partial application of reduce.
@@ -309,14 +302,11 @@ template <typename T>
 auto print(std::ostream& os, std::vector<T> const& x) -> std::ostream&
 {
     os << "{ ";
-    (void)reduce(
-        [](std::ostream& os, T const& element) {
-            os << element;
-            os << ", ";
-            return std::ref(os);
-        },
-        std::ref(os), x);
-    os << "}";
+    for (std::size_t i = 0; i < x.size(); ++i) {
+        os << x[i];
+        if (i < x.size() - 1) { os << ", "; }
+    }
+    os << " }";
     return os;
 }
 
@@ -325,34 +315,22 @@ template <typename T, std::size_t N>
 auto print(std::ostream& os, std::array<T, N> const& x) -> std::ostream&
 {
     os << "{ ";
-    (void)reduce(
-        [](std::ostream& os, T const& element) {
-            os << element;
-            os << ", ";
-            return std::ref(os);
-        },
-        std::ref(os), x);
-    os << "}";
+    for (std::size_t i = 0; i < N; ++i) {
+        os << x[i];
+        if (i < N - 1) { os << ", "; }
+    }
+    os << " }";
     return os;
 }
 
 /// Return true if \p c is a whitespace character.
-[[nodiscard]] inline auto is_whitespace(char c) -> bool
-{
-    return std::isspace(c) != 0;
-}
+[[nodiscard]] inline auto is_whitespace(char c) -> bool { return std::isspace(c) != 0; }
 
 /// Return true if \p c is an alphabetic character.
-[[nodiscard]] inline auto is_alphabetic(char c) -> bool
-{
-    return std::isalpha(c) != 0;
-}
+[[nodiscard]] inline auto is_alphabetic(char c) -> bool { return std::isalpha(c) != 0; }
 
 /// Return true if \p c is a digit character.
-[[nodiscard]] inline auto is_digit(char c) -> bool
-{
-    return std::isdigit(c) != 0;
-}
+[[nodiscard]] inline auto is_digit(char c) -> bool { return std::isdigit(c) != 0; }
 
 /// Return true if \p c is a hexadecimanl digit character.
 [[nodiscard]] inline auto is_hexidecimal_digit(char c) -> bool
@@ -361,22 +339,13 @@ auto print(std::ostream& os, std::array<T, N> const& x) -> std::ostream&
 }
 
 /// Return true if \p c is a control character.
-[[nodiscard]] inline auto is_control(char c) -> bool
-{
-    return std::iscntrl(c) != 0;
-}
+[[nodiscard]] inline auto is_control(char c) -> bool { return std::iscntrl(c) != 0; }
 
 /// Return true if \p c is a control character.
-[[nodiscard]] inline auto is_graphical(char c) -> bool
-{
-    return std::isgraph(c) != 0;
-}
+[[nodiscard]] inline auto is_graphical(char c) -> bool { return std::isgraph(c) != 0; }
 
 /// Return true if \p c is a blank character.
-[[nodiscard]] inline auto is_blank(char c) -> bool
-{
-    return std::isblank(c) != 0;
-}
+[[nodiscard]] inline auto is_blank(char c) -> bool { return std::isblank(c) != 0; }
 
 /// Return true if \p c is an alphanumeric character.
 [[nodiscard]] inline auto is_alphanumeric(char c) -> bool
@@ -385,16 +354,10 @@ auto print(std::ostream& os, std::array<T, N> const& x) -> std::ostream&
 }
 
 /// Return true if \p c is a lowercase character.
-[[nodiscard]] inline auto is_lowercase(char c) -> bool
-{
-    return std::islower(c) != 0;
-}
+[[nodiscard]] inline auto is_lowercase(char c) -> bool { return std::islower(c) != 0; }
 
 /// Return true if \p c is an uppercase character.
-[[nodiscard]] inline auto is_uppercase(char c) -> bool
-{
-    return std::isupper(c) != 0;
-}
+[[nodiscard]] inline auto is_uppercase(char c) -> bool { return std::isupper(c) != 0; }
 
 /// Return true if \p c is a punctuation character.
 [[nodiscard]] inline auto is_punctuation(char c) -> bool
@@ -403,10 +366,7 @@ auto print(std::ostream& os, std::array<T, N> const& x) -> std::ostream&
 }
 
 /// Return true if \p c is a printable character.
-[[nodiscard]] inline auto is_printable(char c) -> bool
-{
-    return std::isprint(c) != 0;
-}
+[[nodiscard]] inline auto is_printable(char c) -> bool { return std::isprint(c) != 0; }
 
 }  // namespace zzz
 #endif  // ZZZ_ZZZ_HPP

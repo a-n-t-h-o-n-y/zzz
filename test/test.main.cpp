@@ -1,331 +1,346 @@
 #include <array>
-#include <cassert>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <optional>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <variant>
 #include <vector>
 
-#include "zzz/zzz.hpp"
+#include <zzz/zzz.hpp>
+#define TEST_MAIN
+#include <zzz/test.hpp>
 
-void test_head_tail()
+TEST(head_tail)
 {
     {
         auto const x = std::vector<int>{1, 2, 3, 4, 5};
-
-        assert(*zzz::head(x) == 1);
-        assert(*zzz::tail(x) == 5);
+        ASSERT(*zzz::head(x) == 1);
+        ASSERT(*zzz::tail(x) == 5);
     }
     {
         auto const x = std::vector<int>{};
-
-        assert(!zzz::head(x).has_value());
-        assert(!zzz::tail(x).has_value());
+        ASSERT(!zzz::head(x).has_value());
+        ASSERT(!zzz::tail(x).has_value());
     }
     {
         auto const x = std::string{"foobar"};
-
-        assert(*zzz::head(x) == 'f');
-        assert(*zzz::tail(x) == 'r');
+        ASSERT(*zzz::head(x) == 'f');
+        ASSERT(*zzz::tail(x) == 'r');
     }
     {
         auto const x = std::string{""};
-
-        assert(!zzz::head(x).has_value());
-        assert(!zzz::tail(x).has_value());
+        ASSERT(!zzz::head(x).has_value());
+        ASSERT(!zzz::tail(x).has_value());
     }
 }
 
-void test_lookup()
+TEST(lookup)
 {
     {
-        auto const x =
-            std::map<int, std::string>{{1, "foo"}, {2, "bar"}, {4, "baz"}};
-        assert(*zzz::lookup(x, 2) == "bar");
-        assert(*zzz::lookup(x, 1) == "foo");
-        assert(*zzz::lookup(x, 4) == "baz");
-        assert(!zzz::lookup(x, 3).has_value());
-        assert(!zzz::lookup(x, 300).has_value());
+        auto const x = std::map<int, std::string>{{1, "foo"}, {2, "bar"}, {4, "baz"}};
+        ASSERT(*zzz::lookup(x, 2) == "bar");
+        ASSERT(*zzz::lookup(x, 1) == "foo");
+        ASSERT(*zzz::lookup(x, 4) == "baz");
+        ASSERT(!zzz::lookup(x, 3).has_value());
+        ASSERT(!zzz::lookup(x, 300).has_value());
     }
     {
-        auto const x = std::unordered_map<int, std::string>{
-            {1, "foo"}, {2, "bar"}, {4, "baz"}};
-        assert(*zzz::lookup(x, 2) == "bar");
-        assert(*zzz::lookup(x, 1) == "foo");
-        assert(*zzz::lookup(x, 4) == "baz");
-        assert(!zzz::lookup(x, 3).has_value());
-        assert(!zzz::lookup(x, 300).has_value());
+        auto const x =
+            std::unordered_map<int, std::string>{{1, "foo"}, {2, "bar"}, {4, "baz"}};
+        ASSERT(*zzz::lookup(x, 2) == "bar");
+        ASSERT(*zzz::lookup(x, 1) == "foo");
+        ASSERT(*zzz::lookup(x, 4) == "baz");
+        ASSERT(!zzz::lookup(x, 3).has_value());
+        ASSERT(!zzz::lookup(x, 300).has_value());
     }
 }
 
-void test_contains()
+TEST(contains)
 {
     {
         auto const x = std::vector<int>{1, 2, 3, 4, 5};
 
-        assert(zzz::contains(x, 1));
-        assert(zzz::contains(x, 2));
-        assert(!zzz::contains(x, 30));
+        ASSERT(zzz::contains(x, 1));
+        ASSERT(zzz::contains(x, 2));
+        ASSERT(!zzz::contains(x, 30));
     }
     {
-        auto const x     = std::vector<int>{1, 2, 3, 4, 5};
+        auto const x = std::vector<int>{1, 2, 3, 4, 5};
         auto const check = zzz::contains(x);
 
-        assert(check(1));
-        assert(check(2));
-        assert(!check(30));
+        ASSERT(check(1));
+        ASSERT(check(2));
+        ASSERT(!check(30));
     }
     {
         auto const x = std::vector<int>{};
 
-        assert(!zzz::contains(x, 1));
-        assert(!zzz::contains(x, 2));
+        ASSERT(!zzz::contains(x, 1));
+        ASSERT(!zzz::contains(x, 2));
     }
     {
         auto const x = std::string{"foobarbaz"};
 
-        assert(zzz::contains(x, 'f'));
-        assert(zzz::contains(x, 'a'));
-        assert(!zzz::contains(x, 'y'));
-        assert(!zzz::contains(x, 'F'));
+        ASSERT(zzz::contains(x, 'f'));
+        ASSERT(zzz::contains(x, 'a'));
+        ASSERT(!zzz::contains(x, 'y'));
+        ASSERT(!zzz::contains(x, 'F'));
     }
     {
-        auto const x     = std::string{"foobarbaz"};
+        auto const x = std::string{"foobarbaz"};
         auto const check = zzz::contains(x);
 
-        assert(check('f'));
-        assert(check('a'));
-        assert(!check('y'));
-        assert(!check('F'));
+        ASSERT(check('f'));
+        ASSERT(check('a'));
+        ASSERT(!check('y'));
+        ASSERT(!check('F'));
     }
     {
         auto const x = std::string{""};
 
-        assert(!zzz::contains(x, 'f'));
-        assert(!zzz::contains(x, 'a'));
+        ASSERT(!zzz::contains(x, 'f'));
+        ASSERT(!zzz::contains(x, 'a'));
     }
     {
         auto const x = std::string{"foobarbaz"};
 
-        assert(zzz::contains(x, "foo"));
-        assert(zzz::contains(x, "obar"));
-        assert(!zzz::contains(x, "aaa"));
-        assert(!zzz::contains(x, "asdflkjasdklfjlaskdjflkasjdflkjaksdjf"));
+        ASSERT(zzz::contains(x, "foo"));
+        ASSERT(zzz::contains(x, "obar"));
+        ASSERT(!zzz::contains(x, "aaa"));
+        ASSERT(!zzz::contains(x, "asdflkjasdklfjlaskdjflkasjdflkjaksdjf"));
     }
     {
         auto const x = std::string{""};
 
-        assert(!zzz::contains(x, ""));
-        assert(!zzz::contains(x, "foo"));
-        assert(!zzz::contains(x, "asdflkasjdflkjasldkfjalsdkjf"));
+        ASSERT(!zzz::contains(x, ""));
+        ASSERT(!zzz::contains(x, "foo"));
+        ASSERT(!zzz::contains(x, "asdflkasjdflkjasldkfjalsdkjf"));
     }
     {
-        auto const x     = std::string{"foobarbaz"};
+        auto const x = std::string{"foobarbaz"};
         auto const check = zzz::contains(x);
 
-        assert(check("foo"));
-        assert(check("obar"));
-        assert(!check("aaa"));
-        assert(!check("asdflkjasdklfjlaskdjflkasjdflkjaksdjf"));
+        ASSERT(check("foo"));
+        ASSERT(check("obar"));
+        ASSERT(!check("aaa"));
+        ASSERT(!check("asdflkjasdklfjlaskdjflkasjdflkjaksdjf"));
     }
 }
 
-void test_zip()
+TEST(zip)
 {
+    using namespace std::literals;
     {
         auto const x = std::vector{1, 2, 3, 4, 5};
-        auto const y =
-            std::vector<std::string>{"abc", "def", "ghi", "jkl", "mno"};
+        auto const y = std::vector<std::string>{"abc", "def", "ghi", "jkl", "mno"};
 
-        for (auto const& [a, b] : zzz::zip(x, y))
-            std::cout << a << ' ' << b << '\n';
+        {
+            auto const z = zzz::zip(x, y);
+            ASSERT(z.size() == x.size());
+            ASSERT(std::get<0>(z[0]) == 1);
+            ASSERT(std::get<1>(z[0]) == "abc");
+            ASSERT(std::get<0>(z[1]) == 2);
+            ASSERT(std::get<1>(z[1]) == "def");
+            ASSERT(std::get<0>(z[4]) == 5);
+            ASSERT(std::get<1>(z[4]) == "mno");
+        }
 
         try {
             // zipping different lengths will throw.
             auto const z = std::vector<char>{'a', 'b', 'c'};
             auto const r = zzz::zip(x, z);
-            assert(false);
+            ASSERT(false);
         }
         catch (std::runtime_error const&) {
-            assert(true);
+            ASSERT(true);
         }
         catch (...) {
-            assert(false);
+            ASSERT(false);
         }
     }
     {
         auto const x = std::vector{1, 2, 3, 4, 5};
-        auto const y =
-            std::vector<std::string>{"abc", "def", "ghi", "jkl", "mno"};
+        auto const y = std::vector<std::string>{"abc", "def", "ghi", "jkl", "mno"};
         auto const z = std::vector{4.5, 3.234, 2.5, 52.6, 32.34};
 
-        for (auto const& [a, b, c] : zzz::zip(x, y, z))
-            std::cout << a << ' ' << b << ' ' << c << '\n';
+        auto const r = zzz::zip(x, y, z);
+        ASSERT(r.size() == x.size());
+        ASSERT(std::get<0>(r[0]) == 1);
+        ASSERT(std::get<1>(r[0]) == "abc");
+        ASSERT(std::get<2>(r[0]) == 4.5);
+        ASSERT(std::get<0>(r[1]) == 2);
+        ASSERT(std::get<1>(r[1]) == "def");
+        ASSERT(std::get<2>(r[1]) == 3.234);
+        ASSERT(std::get<0>(r[4]) == 5);
+        ASSERT(std::get<1>(r[4]) == "mno");
+        ASSERT(std::get<2>(r[4]) == 32.34);
     }
     {
         auto const x = std::array{1, 2, 3, 4, 5};
         auto const y = std::array{"abc", "def", "ghi", "jkl", "mno"};
 
-        for (auto const& [a, b] : zzz::zip(x, y))
-            std::cout << a << ' ' << b << '\n';
+        auto const z = zzz::zip(x, y);
+        ASSERT(z.size() == x.size());
+        ASSERT(std::get<0>(z[0]) == 1);
+        ASSERT(std::get<1>(z[0]) == "abc"sv);
+        ASSERT(std::get<0>(z[1]) == 2);
+        ASSERT(std::get<1>(z[1]) == "def"sv);
+        ASSERT(std::get<0>(z[4]) == 5);
+        ASSERT(std::get<1>(z[4]) == "mno"sv);
     }
     {
         auto const x = std::array{1, 2, 3, 4, 5};
         auto const y = std::array{"abc", "def", "ghi", "jkl", "mno"};
         auto const z = std::array{4.5, 3.234, 2.5, 52.6, 32.34};
 
-        for (auto const& [a, b, c] : zzz::zip(x, y, z))
-            std::cout << a << ' ' << b << ' ' << c << '\n';
-    }
-    {
-        auto const y = std::vector{"abc", "def", "ghi", "jkl", "mno"};
-        for (auto const& [index, element] : zzz::zip_with_index(y))
-            std::cout << index << ' ' << element << '\n';
-
-        for (auto const& [index, element] : zzz::zip_with_index(y, 100))
-            std::cout << index << ' ' << element << '\n';
-
-        for (auto const& [i, e] : zzz::zip_with_index(std::vector<int>{}))
-            std::cout << i << ' ' << e << '\n';
+        auto const r = zzz::zip(x, y, z);
+        ASSERT(r.size() == x.size());
+        ASSERT(std::get<0>(r[0]) == 1);
+        ASSERT(std::get<1>(r[0]) == "abc"sv);
+        ASSERT(std::get<2>(r[0]) == 4.5);
+        ASSERT(std::get<0>(r[1]) == 2);
+        ASSERT(std::get<1>(r[1]) == "def"sv);
+        ASSERT(std::get<2>(r[1]) == 3.234);
+        ASSERT(std::get<0>(r[4]) == 5);
+        ASSERT(std::get<1>(r[4]) == "mno"sv);
+        ASSERT(std::get<2>(r[4]) == 32.34);
     }
 }
 
-void test_split()
+TEST(split)
 {
     {
         auto const x = zzz::split("foo bar baz");
-        assert(x.size() == 3);
-        assert(x[0] == "foo");
-        assert(x[1] == "bar");
-        assert(x[2] == "baz");
+        ASSERT(x.size() == 3);
+        ASSERT(x[0] == "foo");
+        ASSERT(x[1] == "bar");
+        ASSERT(x[2] == "baz");
     }
     {
         auto const x = zzz::split("foo,bar,baz", ",");
-        assert(x.size() == 3);
-        assert(x[0] == "foo");
-        assert(x[1] == "bar");
-        assert(x[2] == "baz");
+        ASSERT(x.size() == 3);
+        ASSERT(x[0] == "foo");
+        ASSERT(x[1] == "bar");
+        ASSERT(x[2] == "baz");
     }
     {
         auto const x = zzz::split("foo, bar, baz", ", ");
-        assert(x.size() == 3);
-        assert(x[0] == "foo");
-        assert(x[1] == "bar");
-        assert(x[2] == "baz");
+        ASSERT(x.size() == 3);
+        ASSERT(x[0] == "foo");
+        ASSERT(x[1] == "bar");
+        ASSERT(x[2] == "baz");
     }
     {
         auto const x = zzz::split("foobarbaz");
-        assert(x.size() == 1);
-        assert(x[0] == "foobarbaz");
+        ASSERT(x.size() == 1);
+        ASSERT(x[0] == "foobarbaz");
     }
     {
         auto const x = zzz::split("foo:::::bar:::baz", ":");
-        assert(x.size() == 9);
-        assert(x[0] == "foo");
-        assert(x[5] == "bar");
-        assert(x[8] == "baz");
+        ASSERT(x.size() == 9);
+        ASSERT(x[0] == "foo");
+        ASSERT(x[5] == "bar");
+        ASSERT(x[8] == "baz");
     }
     {
         auto const x = zzz::split("", ",");
-        assert(zzz::is_empty(x));
+        ASSERT(zzz::is_empty(x));
     }
     {
         try {
             (void)zzz::split("foo,bar,baz", "");
-            assert(false);
+            ASSERT(false);
         }
         catch (std::runtime_error const&) {
-            assert(true);
+            ASSERT(true);
         }
         catch (...) {
-            assert(false);
+            ASSERT(false);
         }
     }
 }
 
-void test_substring() { assert(zzz::substring("foobar", 3, 3) == "bar"); }
+TEST(substring) { ASSERT(zzz::substring("foobar", 3, 3) == "bar"); }
 
-void test_getline()
+TEST(getline)
 {
-    auto is           = std::istringstream{"Hello\nWorld\n"};
-    auto const hello  = zzz::getline(is);
-    auto const world  = zzz::getline(is);
-    auto const empty  = zzz::getline(is);
+    auto is = std::istringstream{"Hello\nWorld\n"};
+    auto const hello = zzz::getline(is);
+    auto const world = zzz::getline(is);
+    auto const empty = zzz::getline(is);
     auto const empty2 = zzz::getline(is);
 
-    assert(hello.has_value());
-    assert(*hello == "Hello");
+    ASSERT(hello.has_value());
+    ASSERT(*hello == "Hello");
 
-    assert(world.has_value());
-    assert(*world == "World");
+    ASSERT(world.has_value());
+    ASSERT(*world == "World");
 
-    assert(!empty.has_value());
-    assert(!empty2.has_value());
+    ASSERT(!empty.has_value());
+    ASSERT(!empty2.has_value());
 
     // while (auto const line = zzz::getline(std::cin))
     //     std::cout << *line << '\n';
-    // std::cout << "exiting\n";
 }
 
-void test_map()
+TEST(map)
 {
     {
         auto const x = std::vector<int>{1, 2, 3, 4, 5};
         auto const r = zzz::map([](int i) { return i * 2; }, x);
-        assert(r.size() == x.size());
-        assert(r[0] == 2);
-        assert(r[1] == 4);
-        assert(r[2] == 6);
-        assert(r[3] == 8);
-        assert(r[4] == 10);
+        ASSERT(r.size() == x.size());
+        ASSERT(r[0] == 2);
+        ASSERT(r[1] == 4);
+        ASSERT(r[2] == 6);
+        ASSERT(r[3] == 8);
+        ASSERT(r[4] == 10);
     }
     {
         auto const x = std::vector<int>{};
         auto const r = zzz::map([](int i) { return i + 1; }, x);
-        assert(zzz::is_empty(r));
+        ASSERT(zzz::is_empty(r));
     }
     {
         auto const x = std::array<int, 5>{1, 2, 3, 4, 5};
         auto const r = zzz::map([](int i) { return i * 2; }, x);
-        assert(r.size() == x.size());
-        assert(r[0] == 2);
-        assert(r[1] == 4);
-        assert(r[2] == 6);
-        assert(r[3] == 8);
-        assert(r[4] == 10);
+        ASSERT(r.size() == x.size());
+        ASSERT(r[0] == 2);
+        ASSERT(r[1] == 4);
+        ASSERT(r[2] == 6);
+        ASSERT(r[3] == 8);
+        ASSERT(r[4] == 10);
     }
     {
         auto const x = std::array<int, 0>{};
         auto const r = zzz::map([](int i) { return i + 1; }, x);
-        assert(zzz::is_empty(r));
+        ASSERT(zzz::is_empty(r));
     }
     {
         auto const x = std::string{"abc"};
         auto const r = zzz::map([](int i) { return i + 1; }, x);
-        assert(r.size() == x.size());
-        assert(r[0] == 'b');
-        assert(r[1] == 'c');
-        assert(r[2] == 'd');
+        ASSERT(r.size() == x.size());
+        ASSERT(r[0] == 'b');
+        ASSERT(r[1] == 'c');
+        ASSERT(r[2] == 'd');
     }
     {
         auto const x = std::string{""};
         auto const r = zzz::map([](int i) { return i + 1; }, x);
-        assert(zzz::is_empty(r));
+        ASSERT(zzz::is_empty(r));
     }
     {
         auto const x = std::optional<int>{5};
         auto const r = zzz::map([](int i) { return i * 2; }, x);
-        assert(r.has_value());
-        assert(*r == 10);
+        ASSERT(r.has_value());
+        ASSERT(*r == 10);
     }
     {
         auto const x = std::optional<int>{std::nullopt};
         auto const r = zzz::map([](int i) { return i * 2; }, x);
-        assert(!r.has_value());
+        ASSERT(!r.has_value());
     }
     {
         struct Visitor {
@@ -334,141 +349,123 @@ void test_map()
             auto operator()(double) { return 6; }
         };
 
-        assert(zzz::map(Visitor{}, std::variant<int, char, double>{3.2}) == 6);
-        assert(zzz::map(Visitor{}, std::variant<int, char, double>{1}) == 4);
-        assert(zzz::map(Visitor{}, std::variant<int, char, double>{'g'}) == 5);
-        assert(zzz::map(Visitor{}, std::variant<char>{'g'}) == 5);
+        ASSERT(zzz::map(Visitor{}, std::variant<int, char, double>{3.2}) == 6);
+        ASSERT(zzz::map(Visitor{}, std::variant<int, char, double>{1}) == 4);
+        ASSERT(zzz::map(Visitor{}, std::variant<int, char, double>{'g'}) == 5);
+        ASSERT(zzz::map(Visitor{}, std::variant<char>{'g'}) == 5);
     }
 }
 
-void test_upper_lowercase()
+TEST(uppercase_lowercase)
 {
     {
         auto x = std::string{"fooBar123"};
-        assert(zzz::uppercase(x) == "FOOBAR123");
+        ASSERT(zzz::uppercase(x) == "FOOBAR123");
 
         auto y = std::string{""};
-        assert(zzz::uppercase(y) == "");
+        ASSERT(zzz::uppercase(y) == "");
     }
     {
         auto x = std::string{"FOoBAR123"};
-        assert(zzz::lowercase(x) == "foobar123");
+        ASSERT(zzz::lowercase(x) == "foobar123");
 
         auto y = std::string{""};
-        assert(zzz::lowercase(y) == "");
+        ASSERT(zzz::lowercase(y) == "");
     }
 }
 
-void test_reduce()
+TEST(reduce)
 {
     {
         auto const x = std::vector<int>{1, 2, 3, 4, 5};
         auto const r = zzz::reduce(std::plus{}, 0, x);
-        assert(r == 15);
+        ASSERT(r == 15);
     }
     {
         auto const x = std::vector<int>{};
         auto const r = zzz::reduce(std::plus{}, 0, x);
-        assert(r == 0);
+        ASSERT(r == 0);
     }
     {
-        auto const x   = std::vector<int>{1, 2, 3, 4, 5};
+        auto const x = std::vector<int>{1, 2, 3, 4, 5};
         auto const sum = zzz::reduce(std::plus{});
-        assert(sum(0, x) == 15);
+        ASSERT(sum(0, x) == 15);
     }
     {
-        auto const x   = std::vector<int>{1, 2, 3, 4, 5};
+        auto const x = std::vector<int>{1, 2, 3, 4, 5};
         auto const sum = zzz::reduce(std::plus{}, 0);
-        assert(sum(x) == 15);
+        ASSERT(sum(x) == 15);
     }
     {
         auto const x = std::array<int, 5>{1, 2, 3, 4, 5};
         auto const r = zzz::reduce(std::multiplies{}, 1, x);
-        assert(r == 120);
+        ASSERT(r == 120);
     }
     {
         auto const x = std::array<int, 0>{};
         auto const r = zzz::reduce(std::multiplies{}, 1, x);
-        assert(r == 1);
+        ASSERT(r == 1);
     }
     {
-        auto const x     = std::array<int, 5>{1, 2, 3, 4, 5};
+        auto const x = std::array<int, 5>{1, 2, 3, 4, 5};
         auto const times = zzz::reduce(std::multiplies{});
-        assert(times(1, x) == 120);
+        ASSERT(times(1, x) == 120);
     }
     {
-        auto const x     = std::array<int, 5>{1, 2, 3, 4, 5};
+        auto const x = std::array<int, 5>{1, 2, 3, 4, 5};
         auto const times = zzz::reduce(std::multiplies{}, 1);
-        assert(times(x) == 120);
+        ASSERT(times(x) == 120);
     }
     {
         auto const x = std::string{"Hello, World!"};
         auto const length =
             zzz::reduce([](int total, char) { return total + 1; }, 0, x);
-        assert(length == 13);
+        ASSERT(length == 13);
     }
     {
         auto const x = std::string{""};
         auto const length =
             zzz::reduce([](int total, char) { return total + 1; }, 0, x);
-        assert(length == 0);
+        ASSERT(length == 0);
     }
     {
         auto const x = std::string{"Hello, World!"};
-        auto const length =
-            zzz::reduce([](int total, char) { return total + 1; });
-        assert(length(0, x) == 13);
+        auto const length = zzz::reduce([](int total, char) { return total + 1; });
+        ASSERT(length(0, x) == 13);
     }
     {
         auto const x = std::string{"Hello, World!"};
-        auto const length =
-            zzz::reduce([](int total, char) { return total + 1; }, 0);
-        assert(length(x) == 13);
+        auto const length = zzz::reduce([](int total, char) { return total + 1; }, 0);
+        ASSERT(length(x) == 13);
     }
 }
 
-void test_print()
+TEST(print)
 {
     {
+        auto ss = std::ostringstream{};
         auto const x = std::vector<int>{1, 2, 3, 4, 5};
-        zzz::print(std::cout, x);
-        std::cout << '\n';
+        zzz::print(ss, x);
+        ASSERT(ss.str() == "{ 1, 2, 3, 4, 5 }");
     }
     {
+        auto ss = std::ostringstream{};
         auto const x = std::array<char, 5>{'a', 'b', 'c', 'd', 'e'};
-        zzz::print(std::cout, x);
-        std::cout << '\n';
+        zzz::print(ss, x);
+        ASSERT(ss.str() == "{ a, b, c, d, e }");
     }
 }
 
-void test_char_traits()
+TEST(char_traits)
 {
-    assert(zzz::is_whitespace(' '));
-    assert(zzz::is_whitespace('\n'));
-    assert(zzz::is_whitespace('\t'));
-    assert(!zzz::is_whitespace('a'));
-    assert(!zzz::is_whitespace('0'));
-    assert(!zzz::is_whitespace('?'));
+    ASSERT(zzz::is_whitespace(' '));
+    ASSERT(zzz::is_whitespace('\n'));
+    ASSERT(zzz::is_whitespace('\t'));
+    ASSERT(!zzz::is_whitespace('a'));
+    ASSERT(!zzz::is_whitespace('0'));
+    ASSERT(!zzz::is_whitespace('?'));
 
-    assert(zzz::is_alphabetic('a'));
-    assert(zzz::is_alphabetic('A'));
-    assert(!zzz::is_alphabetic('?'));
-}
-
-int main()
-{
-    test_head_tail();
-    test_lookup();
-    test_contains();
-    test_zip();
-    test_split();
-    test_substring();
-    test_getline();
-    test_map();
-    test_upper_lowercase();
-    test_reduce();
-    test_print();
-    test_char_traits();
-    std::cout << "SUCCESS\n";
-    return 0;
+    ASSERT(zzz::is_alphabetic('a'));
+    ASSERT(zzz::is_alphabetic('A'));
+    ASSERT(!zzz::is_alphabetic('?'));
 }

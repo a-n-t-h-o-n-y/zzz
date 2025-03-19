@@ -8,16 +8,4 @@ target_include_directories(zzz
         include/
 )
 
-target_compile_features(zzz
-    INTERFACE
-        cxx_std_17
-)
-
-target_compile_options(zzz
-    INTERFACE
-        -Wall
-        -Wextra
-        -Wpedantic
-)
-
 add_subdirectory(test)
