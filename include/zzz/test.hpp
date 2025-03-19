@@ -94,6 +94,22 @@ inline thread_local int assert_count = 0;
 /** Main entry point to run tests.
  *  @return Zero if all tests pass, or the number of failures.
  */
-[[nodiscard]] auto main() -> int { return zzz::test::run_tests(); }
+[[nodiscard]] auto main() -> int
+{
+    // Terminal escape codes.
+    constexpr auto RESET = "\033[0m";  // Reset to default color
+    constexpr auto GREEN = "\033[32m";
+    constexpr auto RED = "\033[31m";
+    constexpr auto YELLOW = "\033[33m";
+    constexpr auto BOLD = "\033[1m";
+    auto const failures = zzz::test::run_tests();
+    if (failures == 0) {
+        std::cout << GREEN << BOLD << "All tests passed." << RESET << '\n';
+    }
+    else {
+        std::cout << RED << BOLD << failures << " tests failed." << RESET << '\n';
+    }
+    return failures;
+}
 
 #endif  // TEST_MAIN
