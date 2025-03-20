@@ -6,6 +6,16 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief Small testing framework.
+ * @details
+ * TEST(unique_id)
+ * {
+ *     ASSERT(expr);
+ *     ASSERT_THROWS(expr, exception_type);
+ * }
+ */
+
 namespace zzz::test {
 
 /** Represents a test case.
@@ -89,6 +99,30 @@ inline thread_local int assert_count = 0;
         ++zzz::test::assert_count;                                         \
     } while (0)
 
+/** Macro for asserting that an expression throws a specific exception.
+ *  @details Throws a std::runtime_error if the expression does not throw the expected
+ *  exception. Increments the assertion counter if the exception is thrown as expected.
+ */
+#define ASSERT_THROWS(expr, exception_type)                              \
+    do {                                                                 \
+        bool threw = false;                                              \
+        try {                                                            \
+            (void)(expr);                                                \
+        }                                                                \
+        catch (const exception_type&) {                                  \
+            threw = true;                                                \
+        }                                                                \
+        catch (...) {                                                    \
+            throw std::runtime_error("Assertion failed: " #expr          \
+                                     " threw the wrong exception type"); \
+        }                                                                \
+        if (!threw) {                                                    \
+            throw std::runtime_error("Assertion failed: " #expr          \
+                                     " did not throw " #exception_type); \
+        }                                                                \
+        ++zzz::test::assert_count;                                       \
+    } while (0)
+
 #ifdef TEST_MAIN
 
 /** Main entry point to run tests.
@@ -100,15 +134,16 @@ inline thread_local int assert_count = 0;
     constexpr auto RESET = "\033[0m";  // Reset to default color
     constexpr auto GREEN = "\033[32m";
     constexpr auto RED = "\033[31m";
-    constexpr auto YELLOW = "\033[33m";
     constexpr auto BOLD = "\033[1m";
     auto const failures = zzz::test::run_tests();
+    std::cout << "----------------------------------------\n";
     if (failures == 0) {
         std::cout << GREEN << BOLD << "All tests passed." << RESET << '\n';
     }
     else {
         std::cout << RED << BOLD << failures << " tests failed." << RESET << '\n';
     }
+    std::cout << "----------------------------------------\n";
     return failures;
 }
 
