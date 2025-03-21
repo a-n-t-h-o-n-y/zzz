@@ -1,6 +1,5 @@
 # TESTS
-
-add_executable(test-zzz EXCLUDE_FROM_ALL
+add_executable(zzz.tests.unit EXCLUDE_FROM_ALL
     container.test.cpp
     coro.test.cpp
     io.test.cpp
@@ -8,23 +7,38 @@ add_executable(test-zzz EXCLUDE_FROM_ALL
     tuple.test.cpp
 )
 
-message(STATUS "AddressSanitizer Enabled")
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(test-zzz PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-    target_link_options(test-zzz PRIVATE -fsanitize=address)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(test-zzz PRIVATE /fsanitize=address)
-    target_link_options(test-zzz PRIVATE /INCREMENTAL:NO /DEBUG /fsanitize=address)
-endif()
-
-target_link_libraries(test-zzz
+target_link_libraries(zzz.tests.unit
     PRIVATE
         zzz
 )
 
-target_compile_options(test-zzz
+target_compile_options(zzz.tests.unit
     PRIVATE
         -Wall
         -Wextra
         -Wpedantic
 )
+
+message(STATUS "AddressSanitizer Enabled for zzz.tests.unit")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(zzz.tests.unit
+        PRIVATE
+            -fsanitize=address
+            -fno-omit-frame-pointer
+    )
+    target_link_options(zzz.tests.unit
+        PRIVATE
+            -fsanitize=address
+    )
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(zzz.tests.unit
+        PRIVATE
+            /fsanitize=address
+    )
+    target_link_options(zzz.tests.unit
+        PRIVATE
+            /INCREMENTAL:NO
+            /DEBUG
+            /fsanitize=address
+    )
+endif()
