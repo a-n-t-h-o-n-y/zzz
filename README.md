@@ -8,4 +8,4 @@ Collection of C++20 Utilities.
 
 ## Tests
 
-Basic tests with target `test-zzz`.
+Basic tests with target `zzz.tests.unit`.
