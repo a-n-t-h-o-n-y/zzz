@@ -12,6 +12,11 @@ add_library(zzz INTERFACE
     include/zzz/tuple.hpp
 )
 
+target_compile_features(zzz
+    INTERFACE
+        cxx_std_20
+)
+
 target_include_directories(zzz
     INTERFACE
         include/
