@@ -1,6 +1,6 @@
 # TESTS
 
-add_executable(test-zzz
+add_executable(test-zzz EXCLUDE_FROM_ALL
     container.test.cpp
     coro.test.cpp
     io.test.cpp
