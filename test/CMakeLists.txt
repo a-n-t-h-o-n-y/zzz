@@ -5,6 +5,7 @@ add_executable(zzz.tests.unit EXCLUDE_FROM_ALL
     io.test.cpp
     string.test.cpp
     tuple.test.cpp
+    aggregate_magic.test.cpp
 )
 
 target_link_libraries(zzz.tests.unit
