@@ -9,6 +9,7 @@ add_library(zzz INTERFACE
     include/zzz/overload.hpp
     include/zzz/string.hpp
     include/zzz/test.hpp
+    include/zzz/timer_thread.hpp
     include/zzz/tuple.hpp
 )
 
